@@ -21,13 +21,18 @@ class Allocator(threading.Thread):
     [2] GeForce GTX 1080 Ti | 34'C,   0 % | 10734 / 11172 MB | amiratag(307M) amiratag(10417M)
     [3] GeForce GTX 1080 Ti | 29'C,   0 % | 10490 / 11172 MB | amiratag(213M) amiratag(10267M)
     '''
-    def GetIdleId(self):
+    def GetIdleId():
         idleid = []
         info = os.popen('gpustat').readlines()
         for line in info[1:]:
             splitline = line.split('|')
+            eff_usage = splitline[1].split(",")[1].strip().split()[0]
+            memory_usage = splitline[2].split('/')
+            used, avail = memory_usage
+            avail = avail.split()[0]
             usage = splitline[-1].strip()
-            if len(usage) == 0:
+            # if len(usage) == 0:
+            if int(eff_usage) == 0 and int(used) < int(avail) - 2000:
                 gpuid = int(splitline[0].split(' ')[0][1:-1])
                 idleid.append(gpuid)
         return idleid
